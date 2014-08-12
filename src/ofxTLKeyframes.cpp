@@ -138,6 +138,16 @@ void ofxTLKeyframes::draw(){
 		ofRect(keyPoints[i].x-1, keyPoints[i].y-1, 3, 3);
 	}
 
+	//**** DRAW LOCKED KEYFRAMES
+	ofSetColor(timeline->getColors().lockedKeyColor);
+	ofNoFill();
+	for(int i = 0; i < keyframes.size(); i++){
+        if ( keyframes[i]->locked)
+        {
+            ofVec2f screenpoint = screenPositionForKeyframe(keyframes[i]);
+			ofRect(screenpoint.x-1, screenpoint.y-1, 3, 3);
+        }
+	}
 	//**** SELECTED KEYS
 	ofSetColor(timeline->getColors().textColor);
 	ofFill();
@@ -241,6 +251,14 @@ float ofxTLKeyframes::evaluateKeyframeAtTime(ofxTLKeyframe* key, unsigned long l
 
 float ofxTLKeyframes::interpolateValueForKeys(ofxTLKeyframe* start,ofxTLKeyframe* end, unsigned long long sampleTime){
 	return ofMap(sampleTime, start->time, end->time, start->value, end->value);
+}
+
+void ofxTLKeyframes::setSelectedKeyframesLock( bool locked )
+{
+    for(int k = 0; k < selectedKeyframes.size(); k++){
+        selectedKeyframes[k]->locked = locked;
+	}
+	if ( selectedKeyframes.size() > 0 ) timeline->flagTrackModified(this);
 }
 
 void ofxTLKeyframes::load(){
@@ -469,9 +487,12 @@ void ofxTLKeyframes::mouseDragged(ofMouseEventArgs& args, long millis){
 		float stretchRatio = 1.0*(millis-long(stretchAnchor)) / (1.0*stretchSelectPoint-stretchAnchor);
 
         for(int k = 0; k < selectedKeyframes.size(); k++){
-            setKeyframeTime(selectedKeyframes[k], ofClamp(stretchAnchor + (selectedKeyframes[k]->grabTimeOffset * stretchRatio),
+            if (  !selectedKeyframes[k]->locked )
+            {
+                setKeyframeTime(selectedKeyframes[k], ofClamp(stretchAnchor + (selectedKeyframes[k]->grabTimeOffset * stretchRatio),
 														  0, timeline->getDurationInMilliseconds()));
-            selectedKeyframes[k]->screenPosition = screenPositionForKeyframe(selectedKeyframes[k]);
+                selectedKeyframes[k]->screenPosition = screenPositionForKeyframe(selectedKeyframes[k]);
+            }
 		}
         timeline->flagUserChangedValue();
         keysDidDrag = true;
@@ -481,11 +502,14 @@ void ofxTLKeyframes::mouseDragged(ofMouseEventArgs& args, long millis){
     if(keysAreDraggable && selectedKeyframes.size() != 0){
         ofVec2f screenpoint(args.x,args.y);
         for(int k = 0; k < selectedKeyframes.size(); k++){
-            ofVec2f newScreenPosition;
-            setKeyframeTime(selectedKeyframes[k], ofClamp(millis - selectedKeyframes[k]->grabTimeOffset,
-														  screenXToMillis(bounds.getMinX()), screenXToMillis(bounds.getMaxX())));
-            selectedKeyframes[k]->value = screenYToValue(args.y - selectedKeyframes[k]->grabValueOffset);
-            selectedKeyframes[k]->screenPosition = screenPositionForKeyframe(selectedKeyframes[k]);
+            if ( !selectedKeyframes[k]->locked )
+            {
+                ofVec2f newScreenPosition;
+                setKeyframeTime(selectedKeyframes[k], ofClamp(millis - selectedKeyframes[k]->grabTimeOffset,
+                                                              screenXToMillis(bounds.getMinX()), screenXToMillis(bounds.getMaxX())));
+                selectedKeyframes[k]->value = screenYToValue(args.y - selectedKeyframes[k]->grabValueOffset);
+                selectedKeyframes[k]->screenPosition = screenPositionForKeyframe(selectedKeyframes[k]);
+            }
         }
         if(selectedKeyframe != NULL && timeline->getMovePlayheadOnDrag()){
             timeline->setCurrentTimeMillis(selectedKeyframe->time);
@@ -648,7 +672,7 @@ void ofxTLKeyframes::addKeyframeAtMillis(float value, unsigned long long millis)
         }
         lastKeyframeIndex = 1;
     } else {
-         key->value = ofMap(value, valueRange.min, valueRange.max, 0, 1.0, true);
+        if ( !key->locked ) key->value = ofMap(value, valueRange.min, valueRange.max, 0, 1.0, true);
     }
 	timeline->flagTrackModified(this);
 	shouldRecomputePreviews = true;
@@ -777,6 +801,14 @@ void ofxTLKeyframes::keyPressed(ofKeyEventArgs& args){
     {
         simplifySelectedKeyframes();
     }
+    if ( args.key == 'l')
+    {
+        setSelectedKeyframesLock(TRUE);
+    }
+    if ( args.key == 'L')
+    {
+        setSelectedKeyframesLock(FALSE);
+    }
     if ( args.key == 'k')
     {
         addKeyframe( getValue() );
@@ -785,9 +817,12 @@ void ofxTLKeyframes::keyPressed(ofKeyEventArgs& args){
 
 void ofxTLKeyframes::nudgeBy(ofVec2f nudgePercent){
 	for(int i = 0; i < selectedKeyframes.size(); i++){
-		setKeyframeTime(selectedKeyframes[i], ofClamp(selectedKeyframes[i]->time + timeline->getDurationInMilliseconds()*nudgePercent.x,
+        if ( !selectedKeyframes[i]->locked )
+        {
+            setKeyframeTime(selectedKeyframes[i], ofClamp(selectedKeyframes[i]->time + timeline->getDurationInMilliseconds()*nudgePercent.x,
 													  0, timeline->getDurationInMilliseconds()));
-		selectedKeyframes[i]->value = ofClamp(selectedKeyframes[i]->value + nudgePercent.y, 0, 1.0);
+            selectedKeyframes[i]->value = ofClamp(selectedKeyframes[i]->value + nudgePercent.y, 0, 1.0);
+        }
 	}
 	updateKeyframeSort();
     timeline->flagTrackModified(this);

@@ -11,6 +11,9 @@
 	<key>
 		<r>52</r><g>175</g><b>195</b><a>255</a>
 	</key>
+	<keylocked>
+		<r>26</r><g>87</g><b>99</b><a>255</a>
+	</keylocked>
 	<highlight>
 		<r>165</r><g>54</g><b>71</b><a>255</a>
 	</highlight>

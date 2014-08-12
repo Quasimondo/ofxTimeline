@@ -191,7 +191,7 @@ void ofxTLCurves::keyPressed(ofKeyEventArgs& args){
 
 
             for(int k = 0; k < selectedKeyframes.size(); k++){
-            ((ofxTLTweenKeyframe*)selectedKeyframes[k])->easeType = eas ingTypes[defaultEasingType];
+            ((ofxTLTweenKeyframe*)selectedKeyframes[k])->easeType = easingTypes[defaultEasingType];
             ((ofxTLTweenKeyframe*)selectedKeyframes[k])->easeFunc = easingFunctions[defaultEasingFunction];
             }
             timeline->flagTrackModified(this);
@@ -243,12 +243,14 @@ void ofxTLCurves::restoreKeyframe(ofxTLKeyframe* key, ofxXmlSettings& xmlStore){
     ofxTLTweenKeyframe* tweenKey =  (ofxTLTweenKeyframe*)key;
     tweenKey->easeFunc = easingFunctions[ofClamp(xmlStore.getValue("easefunc", 0), 0, easingFunctions.size()-1)];
     tweenKey->easeType = easingTypes[ofClamp(xmlStore.getValue("easetype", 0), 0, easingTypes.size()-1)];
+    tweenKey->locked = (xmlStore.getValue("locked", 0) == 1 ? TRUE : FALSE);
 }
 
 void ofxTLCurves::storeKeyframe(ofxTLKeyframe* key, ofxXmlSettings& xmlStore){
     ofxTLTweenKeyframe* tweenKey =  (ofxTLTweenKeyframe*)key;
     xmlStore.addValue("easefunc", tweenKey->easeFunc->id);
     xmlStore.addValue("easetype", tweenKey->easeType->id);
+    xmlStore.addValue("locked", tweenKey->locked ? 1 : 0);
 }
 
 void ofxTLCurves::initializeEasings(){

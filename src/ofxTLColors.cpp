@@ -40,12 +40,12 @@ void ofxTLColors::load(string colorFile) {
 	if(!settings.loadFile(colorFile)){
         ofLogError("ofxTLColors -- Couldn't load color file " + colorFile);
     }
-		
+
     guiBackgroundColor = ofColor(settings.getValue("colors:guiBackground:r", 0),
                                  settings.getValue("colors:guiBackground:g", 0),
                                  settings.getValue("colors:guiBackground:b", 0),
                                  settings.getValue("colors:guiBackground:a", 0));
-    
+
     backgroundColor = ofColor(settings.getValue("colors:background:r", 41),
                               settings.getValue("colors:background:g", 42),
                               settings.getValue("colors:background:b", 53),
@@ -60,26 +60,31 @@ void ofxTLColors::load(string colorFile) {
                        settings.getValue("colors:key:g", 175),
                        settings.getValue("colors:key:b", 195),
                        settings.getValue("colors:key:a", 255));
-    
-    
+
+
     highlightColor = ofColor(settings.getValue("colors:highlight:r", 165),
                              settings.getValue("colors:highlight:g", 54),
                              settings.getValue("colors:highlight:b", 71),
                              settings.getValue("colors:highlight:a", 255));
-    
+
     disabledColor = ofColor(settings.getValue("colors:disabled:r", 98),
                             settings.getValue("colors:disabled:g", 98),
                             settings.getValue("colors:disabled:b", 103),
                             settings.getValue("colors:disabled:a", 255));
-    
+
     modalBackgroundColor = ofColor(settings.getValue("colors:modalBackground:r", 98),
                                    settings.getValue("colors:modalBackground:g", 98),
                                    settings.getValue("colors:modalBackground:b", 103),
                                    settings.getValue("colors:modalBackground:b", 255));
-    
+
     outlineColor = ofColor(settings.getValue("colors:outline:r", 149),
                            settings.getValue("colors:outline:g", 204),
                            settings.getValue("colors:outline:b", 103),
                            settings.getValue("colors:outline:a", 255));
+
+     lockedKeyColor = ofColor(settings.getValue("colors:keylocked:r", 26),
+                           settings.getValue("colors:keylocked:g", 87),
+                           settings.getValue("colors:keylocked:b", 99),
+                           settings.getValue("colors:keylocked:a", 255));
 
 }

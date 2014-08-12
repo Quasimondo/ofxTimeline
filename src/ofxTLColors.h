@@ -38,7 +38,7 @@
 class ofxTLColors
 {
   public:
-	
+
 	void load(); //defaults
 	void load(string colorFile);
 
@@ -50,4 +50,6 @@ class ofxTLColors
 	ofColor disabledColor;
 	ofColor modalBackgroundColor;
 	ofColor outlineColor;
+    ofColor lockedKeyColor;
+
 };

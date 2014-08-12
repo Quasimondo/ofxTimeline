@@ -45,6 +45,7 @@ class ofxTLKeyframe {
     float value; //normalized
     long grabTimeOffset;
     float grabValueOffset;
+    bool locked;
 };
 
 class ofxTLKeyframes : public ofxTLTrack
@@ -93,6 +94,8 @@ class ofxTLKeyframes : public ofxTLTrack
 	virtual unsigned long long getLatestTime();
 	virtual unsigned long long getEarliestSelectedTime();
 	virtual unsigned long long getLatestSelectedTime();
+
+	virtual void setSelectedKeyframesLock( bool locked );
 
     //undo
     virtual string getXMLRepresentation();
